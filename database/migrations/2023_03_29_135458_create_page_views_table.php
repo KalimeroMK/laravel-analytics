@@ -21,7 +21,7 @@ return new class() extends Migration
             $table->string('path')->index();
             $table->string('user_agent')->nullable();
             $table->string('ip')->nullable();
-            $table->string('referer')->nullable()->index();
+            $table->text('referer')->nullable()->index();
             $table->string('county')->nullable()->index();
             $table->string('city')->nullable();
             $table->string('page_model_type')->nullable();

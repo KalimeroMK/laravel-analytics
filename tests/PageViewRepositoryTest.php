@@ -31,7 +31,7 @@ class PageViewRepositoryTest extends TestCase
         $this->assertCount(10, $analyticsData);
     }
 
-    public function testItCanGetPageViewDataByDateGrouppedByPath()
+    public function testItCanGetPageViewDataByDateGroupedByPath()
     {
         $pageViewRepository =  app(PageViewRepository::class);
 
@@ -57,7 +57,7 @@ class PageViewRepositoryTest extends TestCase
         $this->assertEquals(5, $analyticsData['test/2']);
     }
 
-    public function testItCanGetPageViewDataByDateGrouppedByDays()
+    public function testItCanGetPageViewDataByDateGroupedByDays()
     {
         $pageViewRepository =  app(PageViewRepository::class);
 
