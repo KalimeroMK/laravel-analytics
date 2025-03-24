@@ -16,7 +16,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         $this->artisan('migrate', ['--database' => 'testing'])->run();
     }
 
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return [
             LaravelAnalyticsServiceProvider::class

@@ -13,8 +13,6 @@ class AnalyticsControllerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        LaravelAnalytics::routes();
     }
 
     public function testItCanGetPageViewsPerDay()

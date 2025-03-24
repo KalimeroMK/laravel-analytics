@@ -19,7 +19,7 @@ class PageViewFactory extends Factory
      *
      * @return array
      */
-    public function definition()
+    public function definition(): array
     {
         return [
             'session_id' => $this->faker->word,

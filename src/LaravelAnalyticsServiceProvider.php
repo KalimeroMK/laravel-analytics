@@ -12,8 +12,11 @@ class LaravelAnalyticsServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-
+        // Load package migrations
          $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+
+        // Load package routes
+        $this->loadRoutesFrom(__DIR__.'/../routes/api.php');
 
         if ($this->app->runningInConsole()) {
             $this->publishes([
@@ -36,10 +39,6 @@ class LaravelAnalyticsServiceProvider extends ServiceProvider
         // Automatically apply the package configuration
         $this->mergeConfigFrom(__DIR__.'/../config/laravel-analytics.php', 'laravel-analytics');
 
-        // Register the main class to use with the facade
-        $this->app->singleton('laravel-analytics', function () {
-            return new LaravelAnalytics;
-        });
         //Add methods to get data through Analytics facade
         $this->app->singleton('analytics', function ($app) {
             return $app->make(PageViewRepository::class);

@@ -46,4 +46,34 @@ class PageViewRepository
             ->orderBy('date')
             ->pluck('count', 'date');
     }
+
+    public function getLast28Days(): Collection
+    {
+        return $this->getByDateGroupedByDays(Carbon::today()->subDays(28));
+    }
+
+    public function getLast3Months(): Collection
+    {
+        return $this->getByDateGroupedByDays(Carbon::today()->subMonths(3));
+    }
+
+    public function getLast6Months(): Collection
+    {
+        return $this->getByDateGroupedByDays(Carbon::today()->subMonths(6));
+    }
+
+    public function getLastYear(): Collection
+    {
+        return $this->getByDateGroupedByDays(Carbon::today()->subYear());
+    }
+
+    public function getCustomRange(Carbon $startDate, Carbon $endDate): Collection
+    {
+        return PageView::query()
+            ->selectRaw('DATE(created_at) as date, COUNT(id) as count')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->groupBy(DB::raw('DATE(created_at)'))
+            ->orderBy('date')
+            ->pluck('count', 'date');
+    }
 }
