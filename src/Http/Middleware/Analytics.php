@@ -2,9 +2,9 @@
 
 namespace WdevRs\LaravelAnalytics\Http\Middleware;
 
+use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use Closure;
 use Illuminate\Support\Str;
 use Jaybizzle\CrawlerDetect\CrawlerDetect;
 use Throwable;
@@ -17,53 +17,54 @@ class Analytics
         $response = $next($request);
 
         try {
-            if (!$request->isMethod('GET')) {
+            if (!$this->shouldTrack($request)) {
                 return $response;
             }
 
-            if ($request->isJson()) {
-                return $response;
-            }
-
-            $userAgent = $request->userAgent();
-
-            if (is_null($userAgent)) {
-                return $response;
-            }
-
-            /** @var CrawlerDetect $crawlerDetect */
-            $crawlerDetect = app(CrawlerDetect::class);
-
-            if ($crawlerDetect->isCrawler($userAgent)) {
-                return $response;
-            }
-
-            /** @var PageView $pageView */
-            $pageView = PageView::make([
-                'session_id' => session()->getId(),
-                'path' => $request->path(),
-                'user_agent' => Str::substr($userAgent, 0, 255),
-                'ip' => $request->headers->get('X-Forwarded-For') ? $request->headers->get('X-Forwarded-For') : $request->ip(),
-                'referer' => $request->headers->get('referer'),
-            ]);
-
-            $parameters = $request->route()?->parameters();
-            $model = null;
-
-            if (!is_null($parameters)) {
-                $model = reset($parameters);
-            }
-
-            if (is_a($model, Model::class)) {
-                $pageView->pageModel()->associate($model);
-            }
-
-            $pageView->save();
-
-            return $response;
+            $this->storePageView($request);
         } catch (Throwable $e) {
             report($e);
-            return $response;
         }
+
+        return $response;
+    }
+
+    private function shouldTrack(Request $request): bool
+    {
+        if (!$request->isMethod('GET') || $request->isJson()) {
+            return false;
+        }
+
+        $userAgent = $request->userAgent();
+        if (is_null($userAgent) || app(CrawlerDetect::class)->isCrawler($userAgent)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private function storePageView(Request $request): void
+    {
+        $pageView = new PageView([
+            'session_id' => session()->getId(),
+            'path' => $request->path(),
+            'user_agent' => Str::limit($request->userAgent(), 255),
+            'ip' => $request->header('X-Forwarded-For', $request->ip()),
+            'referer' => $request->header('referer'),
+        ]);
+
+        if ($model = $this->getRouteModel($request)) {
+            $pageView->pageModel()->associate($model);
+        }
+
+        $pageView->save();
+    }
+
+    private function getRouteModel(Request $request): ?Model
+    {
+        $parameters = $request->route()?->parameters();
+        $model = $parameters ? reset($parameters) : null;
+
+        return $model instanceof Model ? $model : null;
     }
 }
