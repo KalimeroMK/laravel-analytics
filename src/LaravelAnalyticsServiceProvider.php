@@ -3,6 +3,7 @@
 namespace WdevRs\LaravelAnalytics;
 
 use Illuminate\Support\ServiceProvider;
+use WdevRs\LaravelAnalytics\Repositories\PageViewRepository;
 
 class LaravelAnalyticsServiceProvider extends ServiceProvider
 {
@@ -38,6 +39,10 @@ class LaravelAnalyticsServiceProvider extends ServiceProvider
         // Register the main class to use with the facade
         $this->app->singleton('laravel-analytics', function () {
             return new LaravelAnalytics;
+        });
+        //Add methods to get data through Analytics facade
+        $this->app->singleton('analytics', function ($app) {
+            return $app->make(PageViewRepository::class);
         });
     }
 }

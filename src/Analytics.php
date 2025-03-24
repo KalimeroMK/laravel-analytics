@@ -5,7 +5,7 @@ namespace WdevRs\LaravelAnalytics;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @see \WdevRs\LaravelAnalytics\LaravelAnalytics
+ * @see LaravelAnalytics
  */
 class Analytics extends Facade
 {
